@@ -1,5 +1,7 @@
 # PlatformerSaves
 
+[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kreongd)
+
 <img src="./logo.png" alt="PlatformerSaves logo" />
 
 PlatformerSaves is a Geometry Dash mod for [Geode](https://geode-sdk.org/) that allows you to save and load your progress in platformer levels.
@@ -27,7 +29,7 @@ Found something broken? [Open an issue](https://github.com/dickersonweston-eng/P
 
 ## Support
 
-[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kreongd)
+If you enjoy this mod, consider supporting it on [Ko-fi](https://ko-fi.com/kreongd)!
 
 ## Credits
 
