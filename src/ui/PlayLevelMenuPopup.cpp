@@ -36,9 +36,7 @@ bool PlayLevelMenuPopup::init() {
 }
 
 void PlayLevelMenuPopup::setup() {
-#if defined(GEODE_IS_MAC)
-    PlatformToolbox::showCursor();
-#endif
+    hideAndLockCursor(false);
     CCSize l_win = CCDirector::sharedDirector()->getWinSize();
 
     CCSize l_panelSize = CCSize(l_win.width * 0.52f, l_win.height * 0.62f);
