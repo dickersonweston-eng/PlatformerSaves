@@ -2,6 +2,8 @@
 
 Save and load your progress in platformer levels!
 
+Based on the original mod by [Sabe](https://github.com/0x5abe), updated for GD 2.2081 with multi-slot save support.
+
 ## Features
 
 Pick up right where you left off and enjoy taking breaks without having to leave Geometry Dash open!
