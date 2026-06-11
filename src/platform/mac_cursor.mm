@@ -37,33 +37,22 @@ void setCursorHideBlockedMac(bool blocked) {
 
     if (!blocked) return;
 
-    // Drain the NSCursor hide reference count
-    int nsCursorDrains = 0;
-    while ([NSCursor isHidden]) {
-        [NSCursor unhide];
-        nsCursorDrains++;
-    }
-    [NSCursor unhide]; // one extra in case isHidden reports stale
-    geode::log::info("[PS cursor] NSCursor drain: {} calls, isHidden now = {}",
-                     nsCursorDrains, (bool)[NSCursor isHidden]);
+    // [NSCursor isHidden] was removed in macOS 26 — call unhide a fixed number
+    // of times to drain whatever reference count GD accumulated.
+    for (int i = 0; i < 10; i++) [NSCursor unhide];
+    geode::log::info("[PS cursor] unhid 10x");
 
-    // Also drain via CoreGraphics (used by some GD code paths)
     CGDisplayShowCursor(kCGDirectMainDisplay);
     geode::log::info("[PS cursor] called CGDisplayShowCursor");
 
-    // Ensure mouse is associated with cursor movement (re-enable if decoupled)
     CGAssociateMouseAndMouseCursorPosition(true);
-
-    // Force the arrow cursor (overrides any invisible custom cursor)
     [[NSCursor arrowCursor] set];
 }
 
 void forceShowCursorMac() {
-    int drains = 0;
-    while ([NSCursor isHidden]) { [NSCursor unhide]; drains++; }
-    [NSCursor unhide];
+    for (int i = 0; i < 10; i++) [NSCursor unhide];
     CGDisplayShowCursor(kCGDirectMainDisplay);
     CGAssociateMouseAndMouseCursorPosition(true);
     [[NSCursor arrowCursor] set];
-    geode::log::info("[PS cursor] forceShow: drained={} isHidden={}", drains, (bool)[NSCursor isHidden]);
+    geode::log::info("[PS cursor] forceShow done");
 }
