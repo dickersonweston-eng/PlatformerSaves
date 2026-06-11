@@ -5,13 +5,17 @@
 
 static bool g_blockCursorHide = false;
 static IMP  original_nscursor_hide = nil;
+static int  g_hideBlockedCount = 0;
+static int  g_hidePassedCount  = 0;
 
-// Intercept [NSCursor hide] — used by PlatformToolbox::hideCursor on Mac
 static void swizzled_nscursor_hide(id self, SEL _cmd) {
     if (g_blockCursorHide) {
-        geode::log::info("[PS cursor] blocked [NSCursor hide]");
+        g_hideBlockedCount++;
+        geode::log::info("[PS cursor] BLOCKED hide #{}", g_hideBlockedCount);
         return;
     }
+    g_hidePassedCount++;
+    geode::log::info("[PS cursor] passed hide #{}", g_hidePassedCount);
     if (original_nscursor_hide)
         ((void(*)(id, SEL))original_nscursor_hide)(self, _cmd);
 }
@@ -55,11 +59,11 @@ void setCursorHideBlockedMac(bool blocked) {
 }
 
 void forceShowCursorMac() {
-    while ([NSCursor isHidden]) {
-        [NSCursor unhide];
-    }
+    int drains = 0;
+    while ([NSCursor isHidden]) { [NSCursor unhide]; drains++; }
     [NSCursor unhide];
     CGDisplayShowCursor(kCGDirectMainDisplay);
     CGAssociateMouseAndMouseCursorPosition(true);
     [[NSCursor arrowCursor] set];
+    geode::log::info("[PS cursor] forceShow: drained={} isHidden={}", drains, (bool)[NSCursor isHidden]);
 }

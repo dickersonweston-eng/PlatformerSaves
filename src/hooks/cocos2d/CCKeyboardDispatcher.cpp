@@ -13,11 +13,13 @@ static bool isPopupShowing() {
 // overrides
 
 bool PSCCKeyboardDispatcher::dispatchKeyboardMSG(cocos2d::enumKeyCodes key, bool down, bool arr, double unk) {
+    bool popupShowing = isPopupShowing();
+    if (popupShowing) {
+        geode::log::info("[PS kbd] dispatchKeyboardMSG key={} down={} popupShowing=true", (int)key, down);
+    }
     bool result = CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr, unk);
-    // While our popup is showing, any key-down that reaches PlayLayer leaves
-    // a "key held" state that survives into the level. Immediately synthesize
-    // a key-up so delegates see a clean press-and-release rather than a hold.
-    if (down && isPopupShowing()) {
+    if (down && popupShowing) {
+        geode::log::info("[PS kbd] synthesizing key-up for key={}", (int)key);
         CCKeyboardDispatcher::dispatchKeyboardMSG(key, false, false, unk);
     }
     return result;

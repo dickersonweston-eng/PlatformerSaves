@@ -42,10 +42,11 @@ bool PlayLevelMenuPopup::init() {
 }
 
 void PlayLevelMenuPopup::setup() {
-    // Block cursor hiding and show cursor immediately (Mac swizzle + per-frame show).
+    geode::log::info("[PS popup] setup() — popup opening");
     setCursorHideBlocked(true);
     hideAndLockCursor(false);
     schedule(schedule_selector(PlayLevelMenuPopup::keepCursorVisible));
+    geode::log::info("[PS popup] cursor unblocked+shown, scheduler started");
 
     CCSize winSize = CCDirector::sharedDirector()->getWinSize();
     m_panelSize = CCSize(winSize.width * 0.56f, winSize.height * 0.72f);
@@ -185,6 +186,7 @@ void PlayLevelMenuPopup::setup() {
 
 void PlayLevelMenuPopup::onContinueSlot(CCObject* i_sender) {
     int l_slot = static_cast<CCNode*>(i_sender)->getTag();
+    geode::log::info("[PS popup] onContinueSlot slot={}", l_slot);
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (l_pl && l_pl->m_fields->m_loadingState == LoadingState::WaitingForPlayLevelMenuPopup) {
         l_pl->m_fields->m_saveSlot = l_slot;
@@ -193,6 +195,7 @@ void PlayLevelMenuPopup::onContinueSlot(CCObject* i_sender) {
 }
 
 void PlayLevelMenuPopup::onNewGame(CCObject*) {
+    geode::log::info("[PS popup] onNewGame");
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (!l_pl) { onRemove(nullptr); return; }
 
@@ -227,6 +230,7 @@ void PlayLevelMenuPopup::onNewGame(CCObject*) {
 
 void PlayLevelMenuPopup::onDeleteSlot(CCObject* i_sender) {
     int l_slot = static_cast<CCNode*>(i_sender)->getTag();
+    geode::log::info("[PS popup] onDeleteSlot slot={}", l_slot);
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (!l_pl) return;
 
@@ -276,10 +280,15 @@ void PlayLevelMenuPopup::refreshSlotRow(int i_slot) {
 }
 
 void PlayLevelMenuPopup::keepCursorVisible(float) {
+    static int s_tick = 0;
+    if (++s_tick % 60 == 0) {
+        geode::log::info("[PS popup] keepCursorVisible tick={}", s_tick);
+    }
     hideAndLockCursor(false);
 }
 
 void PlayLevelMenuPopup::keyBackClicked() {
+    geode::log::info("[PS popup] keyBackClicked (Escape pressed)");
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (l_pl && l_pl->m_fields->m_loadingState == LoadingState::WaitingForPlayLevelMenuPopup) {
         l_pl->m_fields->m_saveSlot = -2;
@@ -292,7 +301,10 @@ void PlayLevelMenuPopup::deferredRemove(float) {
     removeFromParentAndCleanup(true);
 }
 
-void PlayLevelMenuPopup::onClose(CCObject*) { keyBackClicked(); }
+void PlayLevelMenuPopup::onClose(CCObject*) {
+    geode::log::info("[PS popup] onClose (X button clicked)");
+    keyBackClicked();
+}
 
 void PlayLevelMenuPopup::onRemove(CCObject*) {
     setCursorHideBlocked(false);
