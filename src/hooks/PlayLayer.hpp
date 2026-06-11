@@ -106,6 +106,9 @@ public:
     // overrides
 
     $override
+    void keyBackClicked();
+
+    $override
     bool init(GJGameLevel* i_level, bool i_useReplay, bool i_dontCreateObjects);
 
     $override

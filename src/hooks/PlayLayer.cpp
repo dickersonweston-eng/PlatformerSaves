@@ -19,6 +19,17 @@ int s_psfVersion = 11;
 
 // overrides
 
+void PSPlayLayer::keyBackClicked() {
+    // While our popup is showing, ignore Escape in PlayLayer — the popup handles it.
+    // Without this, PlayLayer and the popup both receive Escape simultaneously,
+    // which leaves game state confused and requires a second Escape to pause.
+    if (CCScene::get() && CCScene::get()->getChildByID("play-level-menu-popup"_spr)) {
+        geode::log::info("[PS kbd] blocked PlayLayer::keyBackClicked (popup showing)");
+        return;
+    }
+    PlayLayer::keyBackClicked();
+}
+
 bool PSPlayLayer::init(GJGameLevel* i_level, bool i_useReplay, bool i_dontCreateObjects) {
     // for processing objects asynchronously every time
     s_currentPlayLayer = this;
