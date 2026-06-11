@@ -1,0 +1,78 @@
+{
+	"geode": "5.7.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"version": "v1.2.0",
+	"id": "sabe.platformersaves",
+	"name": "PlatformerSaves",
+	"developer": "KreonGD",
+	"description": "Save and load your progress in platformer levels!",
+	"repository": "https://github.com/dickersonweston-eng/PlatformerSaves",
+	"resources": {
+		"sprites": [
+			"resources/saveButton.png"
+		]
+	},
+	"tags": [
+		"enhancement",
+		"gameplay"
+	],
+	"dependencies": {
+"geode.node-ids": {
+			"version": ">=v1.12.0-beta.4",
+			"importance": "required"
+		},
+		"sabe.persistenceapi": {
+			"version": "v1.2.0",
+			"importance": "required"
+		}
+    },
+	"settings": {
+		"auto-save": {
+			"default": true,
+			"name": "Autosave",
+			"description": "Automatically saves the game when reaching a new checkpoint.",
+			"type": "bool"
+		},
+		"editor-saves": {
+			"default": false,
+			"name": "Editor level saves",
+			"description": "Enables saving the game in editor levels (unstable). If the level gets edited after saving all progress must be reset.",
+			"type": "bool"
+		},
+		"remove-save-on-complete": {
+			"default": false,
+			"name": "Remove save on complete",
+			"description": "Removes the save file for a level once it is completed.",
+			"type": "bool"
+		},
+		"disable-popup-on-new-game": {
+			"default": false,
+			"name": "Disable popup on new game",
+			"description": "Automatically starts a new game without showing the popup if a save does not exist for that level.",
+			"type": "bool"
+		},
+		"level-version-warning": {
+			"default": true,
+			"name": "Updated level version warning",
+			"description": "Show a warning when opening a save file that was updated from a previous version of the level.",
+			"type": "bool"
+		},
+		"psf-version-warning": {
+			"default": true,
+			"name": "Updated save file warning",
+			"description": "Show a warning when opening a save file that was updated from a previous PlatformerSaves version.",
+			"type": "bool"
+		}
+	},
+	"incompatibilities": {
+		"thesillydoggo.moretags": {
+			"importance": "breaking",
+			"version": "*"
+		}
+	}
+}
