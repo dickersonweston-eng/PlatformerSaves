@@ -13,7 +13,8 @@
 	"description": "Save and load your progress in platformer levels!",
 	"repository": "https://github.com/dickersonweston-eng/PlatformerSaves",
 	"links": {
-		"support": "https://ko-fi.com/kreongd"
+		"support": "https://ko-fi.com/kreongd",
+		"community": "https://discord.gg/6CrpnYZZ"
 	},
 	"resources": {
 		"sprites": [

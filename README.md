@@ -1,6 +1,7 @@
 # PlatformerSaves
 
 [![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kreongd)
+[![Join our Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/6CrpnYZZ)
 
 <img src="./logo.png" alt="PlatformerSaves logo" />
 
@@ -26,6 +27,10 @@ Pick up right where you left off and enjoy taking breaks without having to leave
 ## Report a bug
 
 Found something broken? [Open an issue](https://github.com/dickersonweston-eng/PlatformerSaves/issues) — please check if it's already been reported before creating a new one.
+
+## Community
+
+Join the [Discord server](https://discord.gg/6CrpnYZZ) to chat, report bugs, or suggest features!
 
 ## Support
 

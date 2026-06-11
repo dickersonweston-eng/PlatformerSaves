@@ -6,8 +6,11 @@ class PlayLevelMenuPopup : public FLAlertLayer {
 public:
     static PlayLevelMenuPopup* create(bool i_slotExists[PS_SAVE_SLOT_COUNT]);
 
+    ~PlayLevelMenuPopup();
     bool init() override;
+    bool ccTouchBegan(cocos2d::CCTouch*, cocos2d::CCEvent*) override;
     void keyBackClicked() override;
+    void registerWithTouchDispatcher() override;
 
 private:
     bool m_slotExists[PS_SAVE_SLOT_COUNT] = {};

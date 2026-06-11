@@ -35,7 +35,28 @@ PlayLevelMenuPopup* PlayLevelMenuPopup::create(bool i_slotExists[PS_SAVE_SLOT_CO
 
 // ─── init / setup ────────────────────────────────────────────────────────────
 
+PlayLevelMenuPopup::~PlayLevelMenuPopup() {
+    CCTouchDispatcher::get()->unregisterForcePrio(this);
+}
+
+void PlayLevelMenuPopup::registerWithTouchDispatcher() {
+    // Use FLAlertLayer's default priority (runs AFTER CCMenu at -128) so button
+    // touches reach the CCMenu before this layer's swallow handler sees them.
+    // The -500 override introduced here was wrong: it caused this layer to run
+    // BEFORE CCMenu and swallow every click before buttons could respond.
+    geode::log::info("[PS popup] registerWithTouchDispatcher — using FLAlertLayer default");
+    FLAlertLayer::registerWithTouchDispatcher();
+}
+
+bool PlayLevelMenuPopup::ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
+    geode::log::info("[PS popup] ccTouchBegan at ({:.1f}, {:.1f}) panel=({:.0f}x{:.0f})",
+        touch->getLocation().x, touch->getLocation().y,
+        m_panelSize.width, m_panelSize.height);
+    return FLAlertLayer::ccTouchBegan(touch, event);
+}
+
 bool PlayLevelMenuPopup::init() {
+    CCTouchDispatcher::get()->registerForcePrio(this, 2);
     if (!FLAlertLayer::init(150)) return false;
     setup();
     return true;
@@ -280,11 +301,15 @@ void PlayLevelMenuPopup::refreshSlotRow(int i_slot) {
 }
 
 void PlayLevelMenuPopup::keepCursorVisible(float) {
+    // The [NSCursor hide] swizzle blocks hide calls while popup is open, so we
+    // only need to force-show once per second as a safety net — NOT every frame.
+    // Calling CGAssociateMouseAndMouseCursorPosition(true) every frame was
+    // resetting macOS mouse state and dropping click events.
     static int s_tick = 0;
     if (++s_tick % 60 == 0) {
         geode::log::info("[PS popup] keepCursorVisible tick={}", s_tick);
+        hideAndLockCursor(false);
     }
-    hideAndLockCursor(false);
 }
 
 void PlayLevelMenuPopup::keyBackClicked() {
