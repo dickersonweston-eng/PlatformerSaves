@@ -27,3 +27,7 @@ Found something broken? [Open an issue](https://github.com/dickersonweston-eng/P
 
 - [Sabe](https://github.com/0x5abe) — original PlatformerSaves mod
 - The Geode team — for building the mod loader that made this possible
+
+## Licensing
+
+This mod is licensed under **GPL-3.0-only**, in keeping with the original mod's license. Source code is available on [GitHub](https://github.com/dickersonweston-eng/PlatformerSaves).

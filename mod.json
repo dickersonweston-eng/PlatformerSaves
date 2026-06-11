@@ -17,9 +17,11 @@
 			"resources/saveButton.png"
 		]
 	},
+	"license": "GPL-3.0-only",
 	"tags": [
 		"enhancement",
-		"gameplay"
+		"gameplay",
+		"utility"
 	],
 	"dependencies": {
 "geode.node-ids": {
