@@ -28,6 +28,7 @@ private:
     void refreshSlotRow(int i_slot);
     void onRemove(cocos2d::CCObject* i_sender);
     void deferredRemove(float);
+    void keepCursorVisible(float);
     void onClose(cocos2d::CCObject* i_sender);
     void onNewGame(cocos2d::CCObject* i_sender);
     void onContinueSlot(cocos2d::CCObject* i_sender);

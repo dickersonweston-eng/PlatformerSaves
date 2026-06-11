@@ -36,7 +36,9 @@ bool PlayLevelMenuPopup::init() {
 }
 
 void PlayLevelMenuPopup::setup() {
-    hideAndLockCursor(false);
+    // GD's loading loop continuously hides the cursor, so we need to show it
+    // every frame while this popup is open rather than just once.
+    schedule(schedule_selector(PlayLevelMenuPopup::keepCursorVisible));
     CCSize l_win = CCDirector::sharedDirector()->getWinSize();
 
     CCSize l_panelSize = CCSize(l_win.width * 0.52f, l_win.height * 0.62f);
@@ -217,15 +219,18 @@ void PlayLevelMenuPopup::refreshSlotRow(int i_slot) {
     }
 }
 
+void PlayLevelMenuPopup::keepCursorVisible(float) {
+    hideAndLockCursor(false);
+}
+
 void PlayLevelMenuPopup::keyBackClicked() {
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (l_pl && l_pl->m_fields->m_loadingState == LoadingState::WaitingForPlayLevelMenuPopup) {
         l_pl->m_fields->m_saveSlot = -2; // cancel
     }
-    // Defer by one frame so the Escape key event fully clears before we remove
-    // ourselves — prevents PlayLayer from seeing an orphaned key-down and
-    // requiring two presses to open the pause menu.
-    setKeyboardEnabled(false);
+    // Defer removal by one frame — calling removeFromParentAndCleanup directly
+    // inside a keyboard dispatch modifies the delegate list mid-iteration which
+    // can leave a stale "key down" state visible to PlayLayer on the next press.
     scheduleOnce(schedule_selector(PlayLevelMenuPopup::deferredRemove), 0.0f);
 }
 
