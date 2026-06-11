@@ -7,7 +7,7 @@
 		"ios": "2.2081"
 	},
 	"version": "v1.2.0",
-	"id": "sabe.platformersaves",
+	"id": "kreon.platformersaves",
 	"name": "PlatformerSaves",
 	"developer": "KreonGD",
 	"description": "Save and load your progress in platformer levels!",
