@@ -20,12 +20,13 @@ int s_psfVersion = 11;
 // overrides
 
 void PSPlayLayer::keyBackClicked() {
-    // While our popup is showing, ignore Escape in PlayLayer — the popup handles it.
-    // Without this, PlayLayer and the popup both receive Escape simultaneously,
-    // which leaves game state confused and requires a second Escape to pause.
-    if (CCScene::get() && CCScene::get()->getChildByID("play-level-menu-popup"_spr)) {
-        geode::log::info("[PS kbd] blocked PlayLayer::keyBackClicked (popup showing)");
-        return;
+    // Geode may patch CCLayer's vtable entry, so this hook can fire on any CCLayer
+    // subclass including our popup. Only block when we're actually the PlayLayer.
+    if (static_cast<PlayLayer*>(this) == PlayLayer::get()) {
+        if (CCScene::get() && CCScene::get()->getChildByID("play-level-menu-popup"_spr)) {
+            geode::log::info("[PS kbd] blocked PlayLayer::keyBackClicked (popup showing)");
+            return;
+        }
     }
     PlayLayer::keyBackClicked();
 }
