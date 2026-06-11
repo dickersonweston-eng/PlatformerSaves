@@ -27,7 +27,7 @@ Found something broken? [Open an issue](https://github.com/dickersonweston-eng/P
 
 ## Support
 
-If you enjoy this mod, consider supporting it on [Ko-fi](https://ko-fi.com/kreongd)!
+[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kreongd)
 
 ## Credits
 
