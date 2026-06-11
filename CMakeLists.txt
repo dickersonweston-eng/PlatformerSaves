@@ -64,4 +64,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 setup_geode_mod(${PROJECT_NAME} EXTERNALS sabe.persistenceapi)
 
-target_link_libraries(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/sabe.persistenceapi/sabe.persistenceapi.dylib")
+# On Mac the dylib isn't pulled in automatically, so link it manually
+if(APPLE AND NOT IOS)
+    target_link_libraries(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/sabe.persistenceapi/sabe.persistenceapi.dylib")
+endif()
