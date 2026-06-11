@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/Geode.hpp>
-#if defined(GEODE_IS_MAC)
+#if defined(GEODE_IS_MACOS)
 #include <platform/mac_cursor.hpp>
 #endif
 
@@ -21,14 +21,14 @@ namespace util::platform {
     inline void toggleLockCursor(bool i_state) {
         #if defined(GEODE_IS_WINDOWS)
             CCEGLView::get()->toggleLockCursor(i_state);
-        #elif defined(GEODE_IS_MAC)
+        #elif defined(GEODE_IS_MACOS)
             // TODO: implement someday
         #endif
     }
 
     // Block or unblock cursor hiding at the OS level (no-op on non-desktop platforms).
     inline void setCursorHideBlocked(bool blocked) {
-        #if defined(GEODE_IS_MAC)
+        #if defined(GEODE_IS_MACOS)
         setCursorHideBlockedMac(blocked);
         #endif
         // Windows: hideCursor is inlined so we can't block it; showCursor every frame
@@ -46,7 +46,7 @@ namespace util::platform {
         if (l_lockCursor) {
             toggleLockCursor(i_hide);
         }
-        #elif defined(GEODE_IS_MAC)
+        #elif defined(GEODE_IS_MACOS)
         if (!i_hide) {
             forceShowCursorMac();
         }

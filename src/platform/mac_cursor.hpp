@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(GEODE_IS_MAC)
+#if defined(GEODE_IS_MACOS)
 // Swizzle [NSCursor hide] at startup so we can block it while the popup is open.
 void installCursorHookMac();
 // Block or unblock all future [NSCursor hide] calls.

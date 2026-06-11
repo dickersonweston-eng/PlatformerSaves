@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlatformToolbox.hpp>
 #include <sabe.persistenceapi/include/PersistenceAPI.hpp>
-#if defined(GEODE_IS_MAC)
+#if defined(GEODE_IS_MACOS)
 #include <platform/mac_cursor.hpp>
 #endif
 
@@ -9,15 +9,12 @@ using namespace geode::prelude;
 using namespace persistenceAPI;
 
 $on_mod(Loaded) {
-#if defined(GEODE_IS_MAC)
-    // Swizzle [NSCursor hide] so we can block it while the save slot popup is open.
-    // This intercepts cursor hiding regardless of which code path GD uses.
+#if defined(GEODE_IS_MACOS)
     installCursorHookMac();
 #endif
 }
 
-#if defined(GEODE_IS_MAC)
-// Belt-and-suspenders: also block via PlatformToolbox in case it adds extra hides.
+#if defined(GEODE_IS_MACOS)
 class $modify(PSPlatformToolbox, PlatformToolbox) {
 public:
     $override
