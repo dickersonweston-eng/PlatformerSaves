@@ -116,11 +116,11 @@ void PlayLevelMenuPopup::setup() {
         slotLabel->setPosition({m_panelSize.width * 0.23f, rowCenterY});
         menu->addChild(slotLabel, 1);
 
-        // Continue / Empty button
+        // Continue / Empty button — wide, fills the right portion of the row
         const char* btnText = filled ? "Continue" : "Empty";
         const char* btnBg   = filled ? "GJ_button_01.png" : "GJ_button_04.png";
         auto* contSprite = ButtonSprite::create(
-            btnText, static_cast<int>(m_panelSize.width * 0.30f),
+            btnText, static_cast<int>(m_panelSize.width * 0.42f),
             true, "goldFont.fnt", btnBg, 0.0f, 0.8f);
         m_continueBtnSprite[i] = contSprite;
 
@@ -128,20 +128,20 @@ void PlayLevelMenuPopup::setup() {
             contSprite, this, menu_selector(PlayLevelMenuPopup::onContinueSlot));
         contBtn->setTag(i);
         contBtn->setID(fmt::format("continue-slot-{}"_spr, i));
-        contBtn->setPosition({m_panelSize.width * 0.54f, rowCenterY});
+        contBtn->setPosition({m_panelSize.width * 0.57f, rowCenterY});
         if (!filled) contBtn->m_bEnabled = false;
         menu->addChild(contBtn, 2);
         m_continueButton[i] = contBtn;
 
-        // Delete button (hidden when slot is empty)
+        // Delete button — snug against the right edge, visible only when slot has a save
         auto* delSprite = ButtonSprite::create(
-            "Delete", static_cast<int>(m_panelSize.width * 0.22f),
+            "Delete", static_cast<int>(m_panelSize.width * 0.18f),
             true, "goldFont.fnt", "GJ_button_06.png", 0.0f, 0.8f);
         auto* delBtn = CCMenuItemSpriteExtra::create(
             delSprite, this, menu_selector(PlayLevelMenuPopup::onDeleteSlot));
         delBtn->setTag(i);
         delBtn->setID(fmt::format("delete-slot-{}"_spr, i));
-        delBtn->setPosition({m_panelSize.width * 0.83f, rowCenterY});
+        delBtn->setPosition({m_panelSize.width * 0.87f, rowCenterY});
         if (!filled) {
             delBtn->setVisible(false);
             delBtn->m_bEnabled = false;
