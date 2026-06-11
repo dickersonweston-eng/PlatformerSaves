@@ -5,6 +5,8 @@
 using namespace geode::prelude;
 using namespace persistenceAPI;
 
+#if defined(GEODE_IS_MAC)
+// On Windows hideCursor is inlined so it can't be hooked
 class $modify(PSPlatformToolbox, PlatformToolbox) {
 public:
     $override
@@ -15,3 +17,4 @@ public:
         PlatformToolbox::hideCursor();
     }
 };
+#endif
