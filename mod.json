@@ -8,7 +8,7 @@
 	},
 	"version": "v1.2.0",
 	"id": "kreon.platformersaves",
-	"name": "PlatformerSaves",
+	"name": "Platformer Saves",
 	"developer": "KreonGD",
 	"description": "Save and load your progress in platformer levels!",
 	"repository": "https://github.com/dickersonweston-eng/PlatformerSaves",

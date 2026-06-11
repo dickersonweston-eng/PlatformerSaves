@@ -25,6 +25,10 @@ Pick up right where you left off and enjoy taking breaks without having to leave
 
 Found something broken? [Open an issue](https://github.com/dickersonweston-eng/PlatformerSaves/issues) — please check if it's already been reported before creating a new one.
 
+## Support
+
+If you enjoy this mod, consider supporting it on [Ko-fi](https://ko-fi.com/kreongd)!
+
 ## Credits
 
 - [Sabe](https://github.com/0x5abe) for creating the original PlatformerSaves mod

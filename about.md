@@ -1,4 +1,4 @@
-# PlatformerSaves
+# Platformer Saves
 
 Save and load your progress in platformer levels!
 
@@ -25,4 +25,5 @@ Found something broken? [Open an issue](https://github.com/dickersonweston-eng/P
 
 ## Credits
 
-- Thanks to the Geode team for building the mod loader that made this possible
+- [Sabe](https://github.com/0x5abe) — original PlatformerSaves mod
+- The Geode team — for building the mod loader that made this possible

@@ -9,6 +9,12 @@
 using namespace geode::prelude;
 using namespace util::platform;
 
+// drawSolidRect doesn't exist in GD's cocos2d 2.x — use drawPolygon instead.
+static void drawFilledRect(CCDrawNode* node, float w, float h, ccColor4F color) {
+    CCPoint v[4] = {{-w/2, -h/2}, {w/2, -h/2}, {w/2, h/2}, {-w/2, h/2}};
+    node->drawPolygon(v, 4, color, 0.0f, {0, 0, 0, 0});
+}
+
 // ─── construction ────────────────────────────────────────────────────────────
 
 PlayLevelMenuPopup::PlayLevelMenuPopup(bool i_slotExists[PS_SAVE_SLOT_COUNT]) {
@@ -36,104 +42,143 @@ bool PlayLevelMenuPopup::init() {
 }
 
 void PlayLevelMenuPopup::setup() {
-    // GD's loading loop continuously hides the cursor, so we need to show it
-    // every frame while this popup is open rather than just once.
+    // Block cursor hiding and show cursor immediately (Mac swizzle + per-frame show).
+    setCursorHideBlocked(true);
+    hideAndLockCursor(false);
     schedule(schedule_selector(PlayLevelMenuPopup::keepCursorVisible));
-    CCSize l_win = CCDirector::sharedDirector()->getWinSize();
 
-    CCSize l_panelSize = CCSize(l_win.width * 0.52f, l_win.height * 0.62f);
+    CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+    m_panelSize = CCSize(winSize.width * 0.56f, winSize.height * 0.72f);
+
     m_background = CCScale9Sprite::create("GJ_square01.png");
-    m_background->setContentSize(l_panelSize);
-    m_background->setPosition(l_win / 2.0f);
+    m_background->setContentSize(m_panelSize);
+    m_background->setPosition(winSize / 2.0f);
     m_mainLayer->addChild(m_background, -2);
 
-    CCMenu* l_menu = CCMenu::create();
-    l_menu->ignoreAnchorPointForPosition(false);
-    l_menu->setContentSize(l_panelSize);
-    l_menu->setPosition(l_win / 2.0f);
-    m_mainLayer->addChild(l_menu, 10);
+    CCMenu* menu = CCMenu::create();
+    menu->ignoreAnchorPointForPosition(false);
+    menu->setContentSize(m_panelSize);
+    menu->setPosition(winSize / 2.0f);
+    m_mainLayer->addChild(menu, 10);
 
-    CCLabelBMFont* l_title = CCLabelBMFont::create("Select Save Slot", "goldFont.fnt");
-    l_title->setScale(0.7f);
-    l_title->setPosition({l_panelSize.width / 2.0f, l_panelSize.height - 20.0f});
-    l_menu->addChild(l_title);
+    // ── Title ──────────────────────────────────────────────────────────────
+    auto* title = CCLabelBMFont::create("Select Save Slot", "goldFont.fnt");
+    title->setScale(0.85f);
+    title->setPosition({m_panelSize.width / 2.0f, m_panelSize.height - 20.0f});
+    menu->addChild(title);
 
-    float l_rowH = (l_panelSize.height - 60.0f) / (PS_SAVE_SLOT_COUNT + 1);
-    float l_topY = l_panelSize.height - 48.0f;
+    // Separator under title
+    auto* sep = CCDrawNode::create();
+    drawFilledRect(sep, m_panelSize.width - 24.0f, 3.0f, {0.0f, 0.0f, 0.0f, 0.30f});
+    sep->setPosition({m_panelSize.width / 2.0f, m_panelSize.height - 40.0f});
+    menu->addChild(sep, -1);
+
+    // ── Slot rows ──────────────────────────────────────────────────────────
+    float contentTop    = m_panelSize.height - 52.0f;
+    float contentBottom = 50.0f;
+    m_rowH = (contentTop - contentBottom) / static_cast<float>(PS_SAVE_SLOT_COUNT);
 
     for (int i = 0; i < PS_SAVE_SLOT_COUNT; i++) {
-        float l_y = l_topY - i * l_rowH;
+        float rowCenterY = contentTop - (i + 0.5f) * m_rowH;
+        bool  filled     = m_slotExists[i];
 
-        CCLabelBMFont* l_label = CCLabelBMFont::create(
+        // Row background
+        float bgW = m_panelSize.width - 20.0f;
+        float bgH = m_rowH - 8.0f;
+        auto* rowBg = CCDrawNode::create();
+        drawFilledRect(rowBg, bgW, bgH,
+            filled ? ccColor4F{0.12f, 0.30f, 0.12f, 0.60f}
+                   : ccColor4F{0.18f, 0.18f, 0.18f, 0.55f});
+        rowBg->setPosition({m_panelSize.width / 2.0f, rowCenterY});
+        menu->addChild(rowBg, 0);
+        m_rowBg[i] = rowBg;
+
+        // Slot badge (colored square with slot number)
+        float badgeSize = m_rowH * 0.58f;
+        auto* badge = CCDrawNode::create();
+        drawFilledRect(badge, badgeSize, badgeSize,
+            filled ? ccColor4F{0.90f, 0.67f, 0.12f, 1.0f}
+                   : ccColor4F{0.27f, 0.27f, 0.27f, 1.0f});
+        badge->setPosition({m_panelSize.width * 0.09f, rowCenterY});
+        menu->addChild(badge, 1);
+        m_slotBadge[i] = badge;
+
+        auto* badgeLabel = CCLabelBMFont::create(
+            std::to_string(i + 1).c_str(), "bigFont.fnt");
+        badgeLabel->setScale(0.36f);
+        badgeLabel->setPosition({m_panelSize.width * 0.09f, rowCenterY});
+        menu->addChild(badgeLabel, 2);
+
+        // Slot label
+        auto* slotLabel = CCLabelBMFont::create(
             fmt::format("Slot {}", i + 1).c_str(), "bigFont.fnt");
-        l_label->setScale(0.45f);
-        l_label->setPosition({l_panelSize.width * 0.14f, l_y});
-        l_menu->addChild(l_label);
+        slotLabel->setScale(0.44f);
+        slotLabel->setPosition({m_panelSize.width * 0.23f, rowCenterY});
+        menu->addChild(slotLabel, 1);
 
-        const char* l_btnText = m_slotExists[i] ? "Continue" : "Empty";
-        const char* l_btnBg   = m_slotExists[i] ? "GJ_button_01.png" : "GJ_button_04.png";
-        ButtonSprite* l_contSprite = ButtonSprite::create(
-            l_btnText, static_cast<int>(l_panelSize.width * 0.33f),
-            true, "goldFont.fnt", l_btnBg, 0.0f, 0.8f);
-        m_continueBtnSprite[i] = l_contSprite;
+        // Continue / Empty button
+        const char* btnText = filled ? "Continue" : "Empty";
+        const char* btnBg   = filled ? "GJ_button_01.png" : "GJ_button_04.png";
+        auto* contSprite = ButtonSprite::create(
+            btnText, static_cast<int>(m_panelSize.width * 0.30f),
+            true, "goldFont.fnt", btnBg, 0.0f, 0.8f);
+        m_continueBtnSprite[i] = contSprite;
 
-        CCMenuItemSpriteExtra* l_contBtn = CCMenuItemSpriteExtra::create(
-            l_contSprite, this,
-            menu_selector(PlayLevelMenuPopup::onContinueSlot));
-        l_contBtn->setTag(i);
-        l_contBtn->setID(fmt::format("continue-slot-{}"_spr, i));
-        l_contBtn->setPosition({l_panelSize.width * 0.44f, l_y});
-        if (!m_slotExists[i]) l_contBtn->m_bEnabled = false;
-        l_menu->addChild(l_contBtn);
-        m_continueButton[i] = l_contBtn;
+        auto* contBtn = CCMenuItemSpriteExtra::create(
+            contSprite, this, menu_selector(PlayLevelMenuPopup::onContinueSlot));
+        contBtn->setTag(i);
+        contBtn->setID(fmt::format("continue-slot-{}"_spr, i));
+        contBtn->setPosition({m_panelSize.width * 0.54f, rowCenterY});
+        if (!filled) contBtn->m_bEnabled = false;
+        menu->addChild(contBtn, 2);
+        m_continueButton[i] = contBtn;
 
-        ButtonSprite* l_delSprite = ButtonSprite::create(
-            "Delete", static_cast<int>(l_panelSize.width * 0.22f),
+        // Delete button (hidden when slot is empty)
+        auto* delSprite = ButtonSprite::create(
+            "Delete", static_cast<int>(m_panelSize.width * 0.22f),
             true, "goldFont.fnt", "GJ_button_06.png", 0.0f, 0.8f);
-        CCMenuItemSpriteExtra* l_delBtn = CCMenuItemSpriteExtra::create(
-            l_delSprite, this,
-            menu_selector(PlayLevelMenuPopup::onDeleteSlot));
-        l_delBtn->setTag(i);
-        l_delBtn->setID(fmt::format("delete-slot-{}"_spr, i));
-        l_delBtn->setPosition({l_panelSize.width * 0.79f, l_y});
-        if (!m_slotExists[i]) {
-            l_delBtn->setVisible(false);
-            l_delBtn->m_bEnabled = false;
+        auto* delBtn = CCMenuItemSpriteExtra::create(
+            delSprite, this, menu_selector(PlayLevelMenuPopup::onDeleteSlot));
+        delBtn->setTag(i);
+        delBtn->setID(fmt::format("delete-slot-{}"_spr, i));
+        delBtn->setPosition({m_panelSize.width * 0.83f, rowCenterY});
+        if (!filled) {
+            delBtn->setVisible(false);
+            delBtn->m_bEnabled = false;
         }
-        l_menu->addChild(l_delBtn);
-        m_deleteButton[i] = l_delBtn;
+        menu->addChild(delBtn, 2);
+        m_deleteButton[i] = delBtn;
     }
 
-    float l_newY = l_topY - PS_SAVE_SLOT_COUNT * l_rowH;
-    ButtonSprite* l_newSprite = ButtonSprite::create(
-        "New Game", static_cast<int>(l_panelSize.width * 0.46f),
+    // ── New Game button ────────────────────────────────────────────────────
+    bool hasEmpty = false;
+    for (int i = 0; i < PS_SAVE_SLOT_COUNT; i++) {
+        if (!m_slotExists[i]) { hasEmpty = true; break; }
+    }
+
+    auto* newSprite = ButtonSprite::create(
+        "New Game", static_cast<int>(m_panelSize.width * 0.44f),
         true, "goldFont.fnt", "GJ_button_01.png", 0.0f, 1.0f);
     m_newGameButton = CCMenuItemSpriteExtra::create(
-        l_newSprite, this,
-        menu_selector(PlayLevelMenuPopup::onNewGame));
+        newSprite, this, menu_selector(PlayLevelMenuPopup::onNewGame));
     m_newGameButton->setID("new-game-button"_spr);
-    m_newGameButton->setPosition({l_panelSize.width / 2.0f, l_newY});
-
-    bool l_hasEmpty = false;
-    for (int i = 0; i < PS_SAVE_SLOT_COUNT; i++) {
-        if (!m_slotExists[i]) { l_hasEmpty = true; break; }
-    }
-    if (!l_hasEmpty) {
-        l_newSprite->m_label->setColor({127, 127, 127});
-        l_newSprite->m_BGSprite->setColor({127, 127, 127});
+    m_newGameButton->setPosition({m_panelSize.width / 2.0f, 24.0f});
+    if (!hasEmpty) {
+        newSprite->m_label->setColor({127, 127, 127});
+        newSprite->m_BGSprite->setColor({127, 127, 127});
         m_newGameButton->m_bEnabled = false;
     }
-    l_menu->addChild(m_newGameButton);
+    menu->addChild(m_newGameButton, 2);
 
-    CCSprite* l_closeSprite = CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png");
-    l_closeSprite->setScale(0.8f);
-    CCMenuItemSpriteExtra* l_closeBtn = CCMenuItemSpriteExtra::create(
-        l_closeSprite, this,
-        menu_selector(PlayLevelMenuPopup::onClose));
-    l_closeBtn->setID("close-button"_spr);
-    float l_off = l_closeBtn->getContentWidth() / 5.0f;
-    l_closeBtn->setPosition({l_off, l_panelSize.height - l_off});
-    l_menu->addChild(l_closeBtn);
+    // ── Close button ───────────────────────────────────────────────────────
+    auto* closeSprite = CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png");
+    closeSprite->setScale(0.8f);
+    auto* closeBtn = CCMenuItemSpriteExtra::create(
+        closeSprite, this, menu_selector(PlayLevelMenuPopup::onClose));
+    closeBtn->setID("close-button"_spr);
+    float off = closeBtn->getContentWidth() / 5.0f;
+    closeBtn->setPosition({off, m_panelSize.height - off});
+    menu->addChild(closeBtn, 2);
 }
 
 // ─── callbacks ───────────────────────────────────────────────────────────────
@@ -194,7 +239,6 @@ void PlayLevelMenuPopup::onDeleteSlot(CCObject* i_sender) {
             m_slotExists[l_slot] = false;
             refreshSlotRow(l_slot);
 
-            // Re-enable "New Game" if a slot opened up
             if (m_newGameButton && !m_newGameButton->m_bEnabled) {
                 m_newGameButton->m_bEnabled = true;
                 if (auto* l_s = dynamic_cast<ButtonSprite*>(m_newGameButton->getNormalImage())) {
@@ -217,6 +261,18 @@ void PlayLevelMenuPopup::refreshSlotRow(int i_slot) {
         m_deleteButton[i_slot]->setVisible(false);
         m_deleteButton[i_slot]->m_bEnabled = false;
     }
+    // Update visual indicators to empty state
+    if (m_rowBg[i_slot]) {
+        float bgW = m_panelSize.width - 20.0f;
+        float bgH = m_rowH - 8.0f;
+        m_rowBg[i_slot]->clear();
+        drawFilledRect(m_rowBg[i_slot], bgW, bgH, {0.18f, 0.18f, 0.18f, 0.55f});
+    }
+    if (m_slotBadge[i_slot]) {
+        float badgeSize = m_rowH * 0.58f;
+        m_slotBadge[i_slot]->clear();
+        drawFilledRect(m_slotBadge[i_slot], badgeSize, badgeSize, {0.27f, 0.27f, 0.27f, 1.0f});
+    }
 }
 
 void PlayLevelMenuPopup::keepCursorVisible(float) {
@@ -226,20 +282,19 @@ void PlayLevelMenuPopup::keepCursorVisible(float) {
 void PlayLevelMenuPopup::keyBackClicked() {
     PSPlayLayer* l_pl = static_cast<PSPlayLayer*>(PlayLayer::get());
     if (l_pl && l_pl->m_fields->m_loadingState == LoadingState::WaitingForPlayLevelMenuPopup) {
-        l_pl->m_fields->m_saveSlot = -2; // cancel
+        l_pl->m_fields->m_saveSlot = -2;
     }
-    // Defer removal by one frame — calling removeFromParentAndCleanup directly
-    // inside a keyboard dispatch modifies the delegate list mid-iteration which
-    // can leave a stale "key down" state visible to PlayLayer on the next press.
     scheduleOnce(schedule_selector(PlayLevelMenuPopup::deferredRemove), 0.0f);
 }
 
 void PlayLevelMenuPopup::deferredRemove(float) {
+    setCursorHideBlocked(false);
     removeFromParentAndCleanup(true);
 }
 
 void PlayLevelMenuPopup::onClose(CCObject*) { keyBackClicked(); }
 
 void PlayLevelMenuPopup::onRemove(CCObject*) {
+    setCursorHideBlocked(false);
     removeFromParentAndCleanup(true);
 }

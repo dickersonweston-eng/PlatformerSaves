@@ -4,7 +4,6 @@
 
 class PlayLevelMenuPopup : public FLAlertLayer {
 public:
-    // i_slotExists[i] is true when save slot i contains a valid save file
     static PlayLevelMenuPopup* create(bool i_slotExists[PS_SAVE_SLOT_COUNT]);
 
     bool init() override;
@@ -13,14 +12,18 @@ public:
 private:
     bool m_slotExists[PS_SAVE_SLOT_COUNT] = {};
 
-    // Per-slot button refs (index == slot)
-    CCMenuItemSpriteExtra* m_continueButton[PS_SAVE_SLOT_COUNT] = {};
-    CCMenuItemSpriteExtra* m_deleteButton[PS_SAVE_SLOT_COUNT]   = {};
+    CCMenuItemSpriteExtra* m_continueButton[PS_SAVE_SLOT_COUNT]    = {};
+    CCMenuItemSpriteExtra* m_deleteButton[PS_SAVE_SLOT_COUNT]      = {};
     ButtonSprite*          m_continueBtnSprite[PS_SAVE_SLOT_COUNT] = {};
+    cocos2d::CCDrawNode*   m_rowBg[PS_SAVE_SLOT_COUNT]            = {};
+    cocos2d::CCDrawNode*   m_slotBadge[PS_SAVE_SLOT_COUNT]        = {};
 
     CCMenuItemSpriteExtra* m_newGameButton = nullptr;
-
     cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+
+    // Cached layout values needed by refreshSlotRow
+    cocos2d::CCSize m_panelSize = {};
+    float           m_rowH      = 0.0f;
 
     PlayLevelMenuPopup(bool i_slotExists[PS_SAVE_SLOT_COUNT]);
 

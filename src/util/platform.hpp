@@ -1,5 +1,8 @@
 #pragma once
 #include <Geode/Geode.hpp>
+#if defined(GEODE_IS_MAC)
+#include <platform/mac_cursor.hpp>
+#endif
 
 using namespace geode::prelude;
 
@@ -23,6 +26,15 @@ namespace util::platform {
         #endif
     }
 
+    // Block or unblock cursor hiding at the OS level (no-op on non-desktop platforms).
+    inline void setCursorHideBlocked(bool blocked) {
+        #if defined(GEODE_IS_MAC)
+        setCursorHideBlockedMac(blocked);
+        #endif
+        // Windows: hideCursor is inlined so we can't block it; showCursor every frame
+        // in keepCursorVisible is the best we can do there.
+    }
+
     inline void hideAndLockCursor(bool i_hide) {
         #if defined(GEODE_IS_WINDOWS)
         if (i_hide) {
@@ -35,9 +47,8 @@ namespace util::platform {
             toggleLockCursor(i_hide);
         }
         #elif defined(GEODE_IS_MAC)
-        // On Mac never hide the cursor, but always show it when requested
         if (!i_hide) {
-            PlatformToolbox::showCursor();
+            forceShowCursorMac();
         }
         #endif
     }

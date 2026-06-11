@@ -23,6 +23,11 @@ file(GLOB_RECURSE SOURCES
     ${OS_SOURCES}
 )
 
+if(APPLE AND NOT IOS)
+    set(MAC_CURSOR_MM "${CMAKE_CURRENT_SOURCE_DIR}/src/platform/mac_cursor.mm")
+    list(APPEND SOURCES "${MAC_CURSOR_MM}")
+endif()
+
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME}
@@ -67,4 +72,6 @@ setup_geode_mod(${PROJECT_NAME} EXTERNALS sabe.persistenceapi)
 # On Mac the dylib isn't pulled in automatically, so link it manually
 if(APPLE AND NOT IOS)
     target_link_libraries(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/sabe.persistenceapi/sabe.persistenceapi.dylib")
+    # .mm file must not use the PCH (PCH is C++ only, not Objective-C++)
+    set_source_files_properties("${MAC_CURSOR_MM}" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif()
