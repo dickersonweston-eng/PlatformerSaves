@@ -23,6 +23,15 @@ Pick up right where you left off and enjoy taking breaks without having to leave
 
 Found something broken? [Open an issue](https://github.com/dickersonweston-eng/PlatformerSaves/issues) on GitHub.
 
+## Dependencies
+
+This mod requires the following to be installed:
+
+- **[PersistenceAPI](https://github.com/0x5abe/PersistenceAPI)** by Sabe — handles the underlying save/load file system
+- **[Node IDs](https://github.com/geode-sdk/NodeIDs)** by the Geode team — provides stable identifiers for GD's UI elements
+
+Both are installed automatically by Geode.
+
 ## Credits
 
 - [Sabe](https://github.com/0x5abe) — original PlatformerSaves mod
